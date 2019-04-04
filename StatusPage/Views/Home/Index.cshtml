@@ -1,72 +1,102 @@
-﻿@using StatusCake.Client.Models
-@model IEnumerable<Test>
+﻿@model StatusPage.ViewModels.IndexViewModel
 
 @{
     ViewData["Title"] = "Status";
 }
 
-<h2>TothNET Status</h2>
-<div class="table-responsive">
-    <!--Table-->
-    <table id="tablePreview" class="table table-striped table-borderless table-hover">
-        <!--Table head-->
-        <thead>
-            <tr>
-                @*<th>#</th>*@
-                <th>Website name</th>
-                <th>Status</th>
-                <th style="width: 70%">Uptime</th>
-            </tr>
-        </thead>
-        <!--Table head-->
-        <!--Table body-->
-        <tbody>
-            @foreach (var item in Model)
-            {
-                var color = "";
+<div class="row">
+    <div class="col">
+        @if (!Model.DomainTests.Any(x => x.IsDown) && !Model.ServiceTests.Any(x => x.IsDown))
+        {
+            <div class="alert alert-success" role="alert">
+                <strong>Oh yeah!</strong> All systems are operational.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                <strong>Oh snap!</strong> Some systems are experiencing issues.
+            </div>
+        }
+    </div>
+</div>
 
-                if (item.Uptime == 100)
-                {
-                    color = "bg-success";
-                }
-                else if (item.Uptime > 40)
-                {
-                    color = "bg-warning";
-                }
-                else
-                {
-                    color = "bg-danger";
-                }
+@* Domains *@
+<div class="card">
+    <div class="card-header">
+        <strong>Websites</strong>
+    </div>
+    <div class="card-body pt-3 pl-3 pr-3 pb-0">
+        <div class="table-responsive">
+            <!--Table-->
+            <table id="tablePreview" class="table table-striped table-borderless table-hover rounded">
+                <!--Table head-->
+                <tbody>
+                    @foreach (var item in Model.DomainTests)
+                    {
+                        <tr>
+                            <td class="align-middle"><a href="@string.Concat("https://",item.WebsiteName)" class="text-dark" target="_blank">@item.WebsiteName</a></td>
+                            <td class="align-middle">
+                                @if (@item.IsDown)
+                                {
+                                    <button type="button" class="btn btn-light text-warning float-right btn-sm">
+                                        @item.Status <span class="badge badge-warning"> @item.Uptime%</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-light text-success float-right btn-sm">
+                                        @item.Status <span class="badge badge-success"> @item.Uptime%</span>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <!--Table body-->
+            </table>
+            <!--Table-->
+        </div>
+    </div>
+</div>
 
-                var trStyle = "";
-                bool isDown = item.Status == "Down";
-                if (isDown)
-                {
-                    trStyle = "class=table-danger";
-                }
-                
-                <tr @trStyle>
-                    @*<th scope="row">@item.TestID</th>*@
-                    <td>@item.WebsiteName</td>
-                    <td>
-                        @if (isDown)
-                        {
-                            <span class="badge badge-danger">Down</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-success">Operational</span>
-                        }
-                    </td>
-                    <td>
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar @color" role="progressbar" style="width: 100%" aria-valuenow="@item.Uptime" aria-valuemin="0" aria-valuemax="100">@item.Uptime%</div>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-        <!--Table body-->
-    </table>
-    <!--Table-->
+<br />
+
+@* Services *@
+<div class="card">
+    <div class="card-header">
+        <strong>Other Services</strong>
+    </div>
+    <div class="card-body pt-3 pl-3 pr-3 pb-0">
+        <div class="table-responsive">
+            <!--Table-->
+            <table id="tablePreview" class="table table-striped table-borderless table-hover rounded">
+                <!--Table head-->
+                <tbody>
+                    @foreach (var item in Model.ServiceTests)
+                    {
+                        <tr>
+                            <td class="align-middle">@item.WebsiteName</td>
+                            <td class="align-middle">
+                                @if (@item.IsDown)
+                                {
+                                    <button type="button" class="btn btn-light text-warning float-right btn-sm">
+                                        @item.Status <span class="badge badge-warning"> @item.Uptime%</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-light text-success float-right btn-sm">
+                                        @item.Status <span class="badge badge-success"> @item.Uptime%</span>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <!--Table body-->
+            </table>
+            <!--Table-->
+        </div>
+    </div>
 </div>

@@ -16,12 +16,18 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
-<body>
+<body style="background-color:#eff0f1;">
+
     <div class="container body-content">
-        @RenderBody()
-        <hr />
+        <div class="col">
+            <h2 class="text-center mb-5">TothNET Status Page</h2>
+        </div>
+        <div class="bg-light p-3 shadow-lg rounded">
+            @RenderBody()
+        </div>
+        <br />
         <footer>
-            <p>&copy; 2019 - StatusPage</p>
+            <p>&copy; @DateTime.Now.Year - TothNET Status Page</p>
         </footer>
     </div>
 
