@@ -1,0 +1,85 @@
+﻿@using Newtonsoft.Json
+@model IEnumerable<AdvancedTest>
+
+@{ string scriptText = "";}
+<h6 class="text-secondary text-uppercase">@ViewData["Title"]</h6>
+<ul class="list-group mb-3">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <small><i class="fas fa-circle text-success"></i></small>
+            <div style="width:20%; min-width: 160px;">
+                @if (item.TestType == StatusCake.Client.Enumerators.TestType.Http)
+                {
+                    string webUri = item.WebsiteName;
+                    if (!webUri.StartsWith("http://") && !webUri.StartsWith("https://"))
+                    {
+                        webUri = $"https://{webUri}";
+                    }
+                    <a href="@webUri" class="pl-2 text-dark" target="_blank">@item.WebsiteName</a>
+                }
+                else
+                {
+                    <span  class="pl-2">@item.WebsiteName</span>
+                }
+            </div>
+            <div id="chart-@(item.TestID)" class="w-100 pl-2 pr-3"></div>
+            <script>
+                var options = {
+                    chart: {
+                        type: 'area',
+                        height: 30,
+                        sparkline: {
+                            enabled: true,
+                        }
+                    },
+
+                    series: [{
+                        name: 'Uptime',
+                        data: @Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.Values)),
+                    }],
+
+                    xaxis: {
+                        type: 'datetime',
+                        categories: @Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.Keys)),
+                    },
+
+                    stroke: {
+                        curve: 'straight'
+                    },
+
+                    fill: {
+                        opacity: 0.3,
+                    },
+
+                    colors: ['#b2bbc1'],
+
+                    yaxis: {
+                        min: 0,
+                        max: 109,
+                        forceNiceScale: true,
+                    },
+
+                }
+
+                var chart = new ApexCharts(
+                    document.querySelector("#chart-@(item.TestID)"),
+                    options
+                );
+
+                chart.render();
+            </script>
+
+            <div style="min-width: 50px">
+                @if (@item.IsDown)
+                {
+                    <span class="badge badge-warning badge-pill"> @item.Uptime%</span>
+                }
+                else
+                {
+                    <span class="badge badge-success badge-pill"> @item.Uptime%</span>
+                }
+            </div>
+        </li>
+    }
+</ul>

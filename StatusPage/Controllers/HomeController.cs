@@ -23,22 +23,9 @@ namespace StatusPage.Controllers
 
             foreach(var item in allTests)
             {
-                Uri uriResult;
-                bool isUri = false;
+                AdvancedTest advancedTest = new AdvancedTest(item, await statusCakeClient.GetUptimesAsync(item.TestID,180));
 
-                try
-                {
-                    isUri = Uri.TryCreate(item.WebsiteName.StartsWith("http") ? item.WebsiteName : "https://" + item.WebsiteName, UriKind.Absolute, out uriResult)
-                    && uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp;
-                }
-                catch
-                {
-                   //...
-                }
-
-                AdvancedTest advancedTest = new AdvancedTest(item);
-
-                if (isUri)
+                if (item.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
                     model.DomainTests.Add(advancedTest);
                 }
