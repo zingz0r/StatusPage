@@ -30,7 +30,7 @@ namespace StatusPage
             });
 
             services.AddDbContext<StatusPageContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString")));
+                options.UseNpgsql(Configuration.GetConnectionString("ConnectionString")));
 
             // Background worker db pusher
             services.AddHostedService<DatabaseHostedService>();

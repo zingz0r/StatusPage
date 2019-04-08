@@ -6,28 +6,50 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
     ports:
-      - "5880:80"
+      - "5784:80"
+    depends_on:
+     - postgres
+#     - pgadmin
     volumes:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - .:/var/www/statuspage
-    depends_on:
-     - "postgres"
     networks:
-      - statuspage-network
-    entrypoint: 
-      - ./.docker/wait-for-mssql.sh
+      - postgres
+    restart: unless-stopped
 
   postgres:
-    image: "mcr.microsoft.com/mssql/server"
-    ports:
-      - "1433:1433"
+    container_name: postgres_container
+    image: postgres
     environment:
-      - "MSSQL_SA_PASSWORD=Your_password123"
-      - "ACCEPT_EULA=Y"
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+#    ports:
+#      - "5432:5432"
     networks:
-      - statuspage-network
-      
+      - postgres
+    restart: unless-stopped
+  
+#   pgadmin:
+#    container_name: pgadmin_container
+#    image: dpage/pgadmin4
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+#    volumes:
+#       - pgadmin:/root/.pgadmin
+#    ports:
+#      - "${PGADMIN_PORT:-5050}:80"
+#    networks:
+#      - postgres
+#    restart: unless-stopped
+
 networks:
-  statuspage-network:
+  postgres:
     driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:

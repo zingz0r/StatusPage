@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StatusPage.Data.Entity;
 
 namespace StatusPage.Data
@@ -9,11 +10,14 @@ namespace StatusPage.Data
                : base(options)
         {
             Database.Migrate();
+            Database.EnsureCreated();
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            modelBuilder.ForNpgsqlUseIdentityColumns();
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Alert> Alerts { get; set; }
