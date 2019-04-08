@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using StatusCake.Client;
 using StatusCake.Client.Models;
+using Microsoft.EntityFrameworkCore;
+using StatusPage.Data;
 using StatusPage.Models;
 using StatusPage.ViewModels;
 
@@ -12,20 +15,22 @@ namespace StatusPage.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly StatusPageContext _context;
+        public HomeController(StatusPageContext context)
+        {
+            _context = context;
+        }
         public async Task<IActionResult> Index()
         {
-
-            var statusCakeClient = new StatusCakeClient();
-
-            IEnumerable<Test> allTests = await statusCakeClient.GetTestsAsync();
-
             IndexViewModel model = new IndexViewModel();
 
-            foreach(var item in allTests)
+            var tests = _context.Tests.Select(x => x);
+            foreach (var test in tests)
             {
-                AdvancedTest advancedTest = new AdvancedTest(item, await statusCakeClient.GetUptimesAsync(item.TestID,90));
+                var uptimes = _context.Uptimes.Where(x => x.TestID == test.Id).ToDictionary(t => t.Date, t => t.UptimePercent);
+                AdvancedTest advancedTest = new AdvancedTest(test, uptimes);
 
-                if (item.TestType == StatusCake.Client.Enumerators.TestType.Http)
+                if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
                     model.DomainTests.Add(advancedTest);
                 }
@@ -35,7 +40,6 @@ namespace StatusPage.Controllers
                 }
 
             }
-
 
             return View(model);
         }

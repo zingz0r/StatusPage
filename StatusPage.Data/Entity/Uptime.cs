@@ -23,5 +23,15 @@ namespace StatusPage.Data.Entity
         /// Uptime in precentage
         /// </summary>
         public double UptimePercent { get; set; }
+
+        /// <summary>
+        /// The ID of the test that has this uptime
+        /// </summary>
+        public int TestID { get; set; }
+
+        /// <summary>
+        /// Foreign key
+        /// </summary>
+        public Test Test { get; set; }
     }
 }

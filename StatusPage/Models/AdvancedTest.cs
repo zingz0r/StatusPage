@@ -12,15 +12,15 @@ namespace StatusPage.Models
         public bool IsDown { get; set; }
         public string StatusText { get; set; }
         public Dictionary<DateTime, double> UptimeDictionary { get; set; }
-        public AdvancedTest(Test other, Dictionary<DateTime, double> uptimeDictionary)
+        public AdvancedTest(Data.Entity.Test other, Dictionary<DateTime, double> uptimeDictionary)
         {
-            ContactGroup = other.ContactGroup;
+            ContactGroup = null;
             ContactID = other.ContactID;
             IsDown = other.Status == TestStatus.Down;
             Paused = other.Paused;
             Status = other.Status;
             StatusText = other.Status == TestStatus.Up ? "Operational" : "Down";
-            TestID = other.TestID;
+            TestID = other.Id;
             TestType = other.TestType;
             WebsiteName = other.WebsiteName;
             Uptime = other.Uptime;
