@@ -23,7 +23,7 @@ namespace StatusPage.Controllers
 
             foreach(var item in allTests)
             {
-                AdvancedTest advancedTest = new AdvancedTest(item, await statusCakeClient.GetUptimesAsync(item.TestID,180));
+                AdvancedTest advancedTest = new AdvancedTest(item, await statusCakeClient.GetUptimesAsync(item.TestID,90));
 
                 if (item.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
