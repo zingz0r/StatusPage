@@ -63,7 +63,7 @@ namespace StatusPage.HostedServices
                 // Insert test
                 InsertTest(test);
 
-                // Insert Uptimes
+                //// Insert Uptimes
                 int daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
 
                 IDictionary<DateTime, double> uptimes;
@@ -133,6 +133,7 @@ namespace StatusPage.HostedServices
             {
                 Data.Entity.Uptime efuptime = new Data.Entity.Uptime
                 {
+                    Id = _context.Uptimes.Count() + 1,
                     TestID = test.TestID,
                     Date = uptime.Key,
                     UptimePercent = uptime.Value
