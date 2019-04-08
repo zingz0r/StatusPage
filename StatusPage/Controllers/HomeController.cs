@@ -27,7 +27,7 @@ namespace StatusPage.Controllers
             var tests = _context.Tests.Select(x => x);
             foreach (var test in tests)
             {
-                var uptimes = _context.Uptimes.Where(x => x.TestID == test.Id).ToDictionary(t => t.Date, t => t.UptimePercent);
+                var uptimes = await _context.Uptimes.Where(x => x.TestID == test.Id).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
                 AdvancedTest advancedTest = new AdvancedTest(test, uptimes);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
