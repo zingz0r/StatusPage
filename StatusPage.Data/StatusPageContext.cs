@@ -8,6 +8,7 @@ namespace StatusPage.Data
         public StatusPageContext(DbContextOptions<StatusPageContext> options)
                : base(options)
         {
+            Database.Migrate();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
