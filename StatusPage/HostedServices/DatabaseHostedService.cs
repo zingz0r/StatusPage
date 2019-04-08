@@ -65,7 +65,13 @@ namespace StatusPage.HostedServices
 
                 // Insert Uptimes
                 int daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
-                IDictionary<DateTime, double> uptimes = _statusCakeClient.GetUptimesAsync(test.TestID, daysToShow).Result;
+
+                IDictionary<DateTime, double> uptimes;
+                if (daysToShow <= 0)
+                    uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
+                else
+                    uptimes = _statusCakeClient.GetUptimesAsync(test.TestID, daysToShow).Result;
+
                 InsertUptime(test, uptimes);
 
                 _logger.LogInformation("Checking if there are new data.");
@@ -123,7 +129,7 @@ namespace StatusPage.HostedServices
             if (uptimeData == null)
                 return;
 
-            foreach(var uptime in uptimeData)
+            foreach (var uptime in uptimeData)
             {
                 Data.Entity.Uptime efuptime = new Data.Entity.Uptime
                 {
