@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  statuspage:
+    image: ${DOCKER_REGISTRY-}statuspage
+    container_name: ${DOCKER_REGISTRY-}statuspage
+    build:
+      context: .
+      dockerfile: StatusPage/Dockerfile
