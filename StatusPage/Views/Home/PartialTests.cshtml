@@ -3,6 +3,10 @@
 
 <h6 class="text-secondary text-uppercase">@ViewData["SectionTitle"]</h6>
 <ul class="list-group mb-3">
+
+    @{
+        string dynamicJs = "";
+    }
     @foreach (var item in Model)
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -23,7 +27,7 @@
                 }
             </div>
             <div id="chart-@(item.TestID)" class="w-100 pl-2 pr-3"></div>
-            <div style="min-width: 50px">
+
                 @if (@item.IsDown)
                 {
                     <span class="badge badge-warning badge-pill"> @item.Uptime%</span>
@@ -32,63 +36,78 @@
                 {
                     <span class="badge badge-success badge-pill"> @item.Uptime%</span>
                 }
-            </div>
+
         </li>
-        <script>
-                var options = {
-                    chart: {
-                        type: 'area',
-                        height: 30,
-                        sparkline: {
-                            enabled: true,
-                        }
-                    },
+        dynamicJs = dynamicJs + $@"
+            var options_{item.TestID} = {{
+                chart: {{
+                    type: 'area',
+                    height: 30,
+                    sparkline: {{
+                        enabled: true,
+                    }}
+                }},
 
-                    series: [{
-                        name: 'Uptime',
-                        data: @Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.Values)),
-                    }],
+                series: [{{
+                    name: 'Uptime',
+                    data: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Value)))},
+                }}],
 
-                    xaxis: {
-                        type: 'datetime',
-                        categories: @Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.Keys)),
-                    },
+                xaxis: {{
+                    type: 'datetime',
+                    categories: {Html.Raw(JsonConvert.SerializeObject( item.UptimeDictionary.OrderBy(y => y.Key).Select(x=>x.Key)))},
+                }},
 
-                    stroke: {
-                        curve: 'straight'
-                    },
+                stroke: {{
+                    show: true,
+                    curve: 'smooth',
+                    lineCap: 'butt',
+                    width: 1,
+                    dashArray: 0,
+                }},
+                
+                colors: ['#b2bbc1'],
 
-                    fill: {
-                        opacity: 0.3,
-                    },
+                fill: {{
+                    type: 'gradient',
+                    gradient: {{
+                        shadeIntensity: 1,
+                        inverseColors: false,
+                        opacityFrom: 0.5,
+                        opacityTo: 0,
+                        stops: [0, 90, 100]
+                    }}
+                }},
 
-                    colors: ['#b2bbc1'],
+                yaxis: {{
+                    min: 0,
+                    max: 109,
+                    forceNiceScale: true,
+                }},
 
-                    yaxis: {
-                        min: 0,
-                        max: 109,
-                        forceNiceScale: true,
-                    },
+                responsive: [{{
+                    breakpoint: undefined,
+                    options: {{}},
+                }}],
 
-                    responsive: [{
-                        breakpoint: undefined,
-                        options: {},
-                    }],
+                tooltip: {{
+                    fixed: {{
+                        enabled: false
+                    }},
+                }},
 
-                    tooltip: {
-                        fixed: {
-                            enabled: false
-                        },
-                    },
+            }}
 
-                }
+            var chart_{item.TestID} = new ApexCharts(
+                document.querySelector('#chart-{item.TestID}'),
+                options_{item.TestID}
+            );
 
-                var chart = new ApexCharts(
-                    document.querySelector("#chart-@(item.TestID)"),
-                    options
-                );
-
-                chart.render();
-        </script>
+            chart_{item.TestID}.render();
+        ";
     }
 </ul>
+
+<script>
+@(Html.Raw(dynamicJs))
+</script>
