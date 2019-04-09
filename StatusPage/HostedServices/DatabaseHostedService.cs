@@ -45,7 +45,7 @@ namespace StatusPage.HostedServices
             _logger.LogInformation("Timed Background Service is starting.");
 
             _timer = new Timer(InsertNewDataToDB, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(300));
+                TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
         }
@@ -67,10 +67,7 @@ namespace StatusPage.HostedServices
                 int daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
 
                 IDictionary<DateTime, double> uptimes;
-                if (daysToShow <= 0)
-                    uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
-                else
-                    uptimes = _statusCakeClient.GetUptimesAsync(test.TestID, daysToShow).Result;
+                uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
 
                 InsertUptime(test, uptimes);
 
