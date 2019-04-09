@@ -18,4 +18,4 @@ RUN dotnet publish StatusPage.csproj -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-#ENTRYPOINT ["dotnet", "StatusPage.dll"]
+ENTRYPOINT ["dotnet", "StatusPage.dll"]

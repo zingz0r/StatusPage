@@ -7,49 +7,13 @@ services:
       - ASPNETCORE_URLS=http://+:80
     ports:
       - "5784:80"
-    depends_on:
-     - postgres
-#     - pgadmin
     volumes:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-    networks:
-      - postgres
     restart: unless-stopped
-
-  postgres:
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      PGDATA: /data/postgres
-    volumes:
-       - postgres:/data/postgres
-#    ports:
-#      - "5432:5432"
     networks:
-      - postgres
-    restart: unless-stopped
-  
-#   pgadmin:
-#    container_name: pgadmin_container
-#    image: dpage/pgadmin4
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-#    volumes:
-#       - pgadmin:/root/.pgadmin
-#    ports:
-#      - "${PGADMIN_PORT:-5050}:80"
-#    networks:
-#      - postgres
-#    restart: unless-stopped
+      - statuspagenetwork
 
 networks:
-  postgres:
+  statuspagenetwork:
     driver: bridge
-
-volumes:
-    postgres:
-    pgadmin:
