@@ -2,8 +2,6 @@
 using StatusCake.Client.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace StatusPage.Models
 {
@@ -11,7 +9,9 @@ namespace StatusPage.Models
     {
         public bool IsDown { get; set; }
         public string StatusText { get; set; }
+
         public Dictionary<DateTime, double> UptimeDictionary { get; set; }
+
         public AdvancedTest(Data.Entity.Test other, Dictionary<DateTime, double> uptimeDictionary)
         {
             ContactGroup = null;

@@ -4,7 +4,7 @@ using StatusPage.Data.Entity;
 
 namespace StatusPage.Data
 {
-    public class StatusPageContext : DbContext
+    public sealed class StatusPageContext : DbContext
     {
         public StatusPageContext(DbContextOptions<StatusPageContext> options)
                : base(options)

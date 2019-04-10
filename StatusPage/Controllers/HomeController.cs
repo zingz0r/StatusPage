@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using StatusCake.Client;
-using StatusCake.Client.Models;
 using Microsoft.EntityFrameworkCore;
 using StatusPage.Data;
 using StatusPage.Models;
@@ -22,13 +18,13 @@ namespace StatusPage.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            IndexViewModel model = new IndexViewModel();
+            var model = new IndexViewModel();
 
             var tests = _context.Tests.Select(x => x);
             foreach (var test in tests)
             {
                 var uptimes = await _context.Uptimes.Where(x => x.TestID == test.Id).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
-                AdvancedTest advancedTest = new AdvancedTest(test, uptimes);
+                var advancedTest = new AdvancedTest(test, uptimes);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
@@ -40,7 +36,7 @@ namespace StatusPage.Controllers
                 }
 
             }
-
+            
             return View(model);
         }
 

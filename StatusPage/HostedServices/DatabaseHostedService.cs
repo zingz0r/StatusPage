@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using StatusCake.Client;
 using StatusCake.Client.Models;
 using StatusPage.Data;
-using StatusPage.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,6 @@ namespace StatusPage.HostedServices
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
-        private readonly IServiceScopeFactory _scopeFactory;
         private readonly StatusCakeClient _statusCakeClient;
         private readonly StatusPageContext _context;
 
@@ -29,13 +27,12 @@ namespace StatusPage.HostedServices
             _logger = logger;
             _configuration = configuration;
 
-            _scopeFactory = scopeFactory;
-            var scope = _scopeFactory.CreateScope();
+            var scope = scopeFactory.CreateScope();
 
             _context = scope.ServiceProvider.GetRequiredService<StatusPageContext>();
 
-            string statusCakeUsername = _configuration.GetSection("StatusCake").GetValue<string>("Username");
-            string statusCakeApiKey = _configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
+            var statusCakeUsername = _configuration.GetSection("StatusCake").GetValue<string>("Username");
+            var statusCakeApiKey = _configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
 
             _statusCakeClient = new StatusCakeClient(statusCakeUsername, statusCakeApiKey);
         }
@@ -44,13 +41,13 @@ namespace StatusPage.HostedServices
         {
             _logger.LogInformation("Timed Background Service is starting.");
 
-            _timer = new Timer(InsertNewDataToDB, null, TimeSpan.Zero,
+            _timer = new Timer(InsertNewDataToDb, null, TimeSpan.Zero,
                 TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
         }
 
-        private void InsertNewDataToDB(object state)
+        private void InsertNewDataToDb(object state)
         {
             _logger.LogInformation("Fetching tests from StatusCake API.");
 
@@ -64,10 +61,9 @@ namespace StatusPage.HostedServices
                 InsertTest(test);
 
                 //// Insert Uptimes
-                int daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
+                var daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
 
-                IDictionary<DateTime, double> uptimes;
-                uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
+                var uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
 
                 InsertUptime(test, uptimes);
 
@@ -115,7 +111,7 @@ namespace StatusPage.HostedServices
                 _context.SaveChanges();
             }
         }
-        private void InsertUptime(Test test, IDictionary<DateTime, double> uptimeData)
+        private void InsertUptime(Test test, SortedDictionary<DateTime, Availability> availabilityData)
         {
             if (_context == null)
                 return;
@@ -123,22 +119,23 @@ namespace StatusPage.HostedServices
             if (test == null)
                 return;
 
-            if (uptimeData == null)
+            if (availabilityData == null)
                 return;
 
-            foreach (var uptime in uptimeData)
+            foreach (var (date, availability) in availabilityData)
             {
-                Data.Entity.Uptime efuptime = new Data.Entity.Uptime
+                var availabilityEntity = new Data.Entity.Uptime
                 {
                     Id = _context.Uptimes.Count() + 1,
                     TestID = test.TestID,
-                    Date = uptime.Key,
-                    UptimePercent = uptime.Value
+                    Date = date,
+                    DowntimePercent = availability.Downtime,
+                    UptimePercent = availability.Uptime
                 };
 
-                if (!_context.Uptimes.Any(x => x.TestID == efuptime.TestID && x.Date == efuptime.Date) && efuptime.Date.Date != DateTime.Now.Date)
+                if (!_context.Uptimes.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date != DateTime.Now.Date)
                 {
-                    _context.Add(efuptime);
+                    _context.Add(availabilityEntity);
                     _context.SaveChanges();
                 }
             }

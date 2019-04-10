@@ -22,7 +22,12 @@ namespace StatusPage.Data.Entity
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// Uptime in precentage
+        /// Downtime in percent
+        /// </summary>
+        public double DowntimePercent { get; set; }
+
+        /// <summary>
+        /// Uptime in percent
         /// </summary>
         public double UptimePercent { get; set; }
 
