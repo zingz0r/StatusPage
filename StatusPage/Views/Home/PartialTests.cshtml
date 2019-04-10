@@ -55,7 +55,7 @@
 
                 xaxis: {{
                     type: 'datetime',
-                    categories: {Html.Raw(JsonConvert.SerializeObject( item.UptimeDictionary.OrderBy(y => y.Key).Select(x=>x.Key)))},
+                    categories: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x=>x.Key)))},
                 }},
 
                 stroke: {{

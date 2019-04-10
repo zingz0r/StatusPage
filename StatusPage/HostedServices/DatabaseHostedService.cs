@@ -124,16 +124,16 @@ namespace StatusPage.HostedServices
 
             foreach (var (date, availability) in availabilityData)
             {
-                var availabilityEntity = new Data.Entity.Uptime
+                var availabilityEntity = new Data.Entity.Availability
                 {
-                    Id = _context.Uptimes.Count() + 1,
+                    Id = _context.Availabilities.Count() + 1,
                     TestID = test.TestID,
                     Date = date,
                     DowntimePercent = availability.Downtime,
                     UptimePercent = availability.Uptime
                 };
 
-                if (!_context.Uptimes.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date != DateTime.Now.Date)
+                if (!_context.Availabilities.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date != DateTime.Now.Date)
                 {
                     _context.Add(availabilityEntity);
                     _context.SaveChanges();

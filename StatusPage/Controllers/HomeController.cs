@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StatusPage.Data;
+using StatusPage.Data.Entity;
 using StatusPage.Models;
 using StatusPage.ViewModels;
 
@@ -18,26 +21,37 @@ namespace StatusPage.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var model = new IndexViewModel();
+            var viewModel = new IndexViewModel();
 
             var tests = _context.Tests.Select(x => x);
+
             foreach (var test in tests)
             {
-                var uptimes = await _context.Uptimes.Where(x => x.TestID == test.Id).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
+                var uptimes = await _context.Availabilities.Where(x => x.TestID == test.Id && x.Date.Date >= DateTime.Now.Date.AddDays(-90)).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
                 var advancedTest = new AdvancedTest(test, uptimes);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
-                    model.DomainTests.Add(advancedTest);
+                    viewModel.DomainTests.Add(advancedTest);
                 }
                 else
                 {
-                    model.ServiceTests.Add(advancedTest);
+                    viewModel.ServiceTests.Add(advancedTest);
                 }
 
             }
+
+            //// average uptime in last 7 days
+            var last7DaysData = await _context.Availabilities
+                .Where(x => x.Date.Date >= DateTime.Now.Date.AddMonths(-1))
+                .GroupBy(y => y.Date).ToDictionaryAsync(x=>x.Key, x=>x.ToList());
             
-            return View(model);
+            foreach (var item in last7DaysData)
+            {
+                viewModel.LastMonthAverageUptime.Add(item.Key, item.Value.Average(x => x.UptimePercent));
+            }
+
+            return View(viewModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

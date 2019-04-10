@@ -25,7 +25,7 @@ namespace StatusPage.Data
         public DbSet<Period> Periods { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestDetails> TestDetails { get; set; }
-        public DbSet<Uptime> Uptimes { get; set; }
+        public DbSet<Availability> Availabilities { get; set; }
     }
 }
 

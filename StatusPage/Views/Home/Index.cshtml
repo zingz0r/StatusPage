@@ -23,6 +23,12 @@
 </div>
 
 @{
+    ViewData["SectionTitle"] = "Last month average uptime";
+    ViewData["SectionText"] = "Based on all test";
+}
+<partial name="~/Views/Home/LargeChart.cshtml" model="Model.LastMonthAverageUptime" view-data="ViewData" />
+
+@{
     ViewData["SectionTitle"] = "Websites";
 }
 <partial name="~/Views/Home/PartialTests.cshtml" model="Model.DomainTests" view-data="ViewData" />

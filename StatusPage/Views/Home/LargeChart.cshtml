@@ -1,0 +1,72 @@
+﻿@using Newtonsoft.Json
+@model SortedDictionary<DateTime, double>
+
+<h6 class="text-secondary text-uppercase">@ViewData["SectionTitle"]</h6>
+<div id="chart"></div>
+
+<script>
+    var options = {
+        chart: {
+            type: 'area',
+            stacked: false,
+            height: 300,
+            toolbar: {
+                show: false
+            },
+
+        },
+        dataLabels: {
+            enabled: false
+        },
+        series: [{
+            name: 'Uptime',
+            data: @Html.Raw(JsonConvert.SerializeObject(Model.Values)),
+        }],
+        yaxis: {
+            min: 0,
+            max: 101,
+            forceNiceScale: true,
+        },
+        xaxis: {
+            type: 'datetime',
+            categories: @Html.Raw(JsonConvert.SerializeObject(Model.Keys)),
+        },
+        tooltip: {
+            x: {
+                format: 'dd/MM/yy HH:mm'
+            },
+        },
+        markers: {
+            size: 0,
+        },
+        stroke: {
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            width: 2,
+            dashArray: 0,
+        },
+                
+        colors: ['#485366'],
+
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0,
+                stops: [0, 90, 100]
+            },
+        },
+    }
+
+    var chart = new ApexCharts(
+        document.querySelector("#chart"),
+        options
+    );
+
+    chart.render();
+
+
+</script>

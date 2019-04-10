@@ -7,12 +7,12 @@ using System.Text;
 namespace StatusPage.Data.Entity
 {
     /// <summary>
-    /// Uptime Class
+    /// Availability Class
     /// </summary>
-    public class Uptime
+    public class Availability
     {
         /// <summary>
-        /// Id of the Uptime
+        /// Id of the Availability
         /// </summary>
         public int Id { get; set; }
 
@@ -27,7 +27,7 @@ namespace StatusPage.Data.Entity
         public double DowntimePercent { get; set; }
 
         /// <summary>
-        /// Uptime in percent
+        /// Availability in percent
         /// </summary>
         public double UptimePercent { get; set; }
 
