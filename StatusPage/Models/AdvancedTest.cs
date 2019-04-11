@@ -2,6 +2,7 @@
 using StatusCake.Client.Models;
 using System;
 using System.Collections.Generic;
+using StatusCake.Client;
 
 namespace StatusPage.Models
 {
@@ -12,7 +13,7 @@ namespace StatusPage.Models
 
         public Dictionary<DateTime, double> UptimeDictionary { get; set; }
 
-        public AdvancedTest(Data.Entity.Test other, Dictionary<DateTime, double> uptimeDictionary)
+        public AdvancedTest(Test other, Dictionary<DateTime, double> uptimeDictionary)
         {
             ContactGroup = null;
             ContactID = other.ContactID;
@@ -20,7 +21,7 @@ namespace StatusPage.Models
             Paused = other.Paused;
             Status = other.Status;
             StatusText = other.Status == TestStatus.Up ? "Operational" : "Down";
-            TestID = other.Id;
+            TestID = other.TestID;
             TestType = other.TestType;
             WebsiteName = other.WebsiteName;
             Uptime = other.Uptime;

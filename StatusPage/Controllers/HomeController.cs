@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StatusCake.Client;
+using StatusCake.Client.Interfaces;
 using StatusPage.Data;
 using StatusPage.Models;
 using StatusPage.ViewModels;
@@ -12,20 +14,21 @@ namespace StatusPage.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IStatusCakeClient _statusCakeClient;
         private readonly StatusPageContext _context;
-        public HomeController(StatusPageContext context)
+        public HomeController(IStatusCakeClient statusCakeClient, StatusPageContext context)
         {
+            _statusCakeClient = statusCakeClient;
             _context = context;
         }
         public async Task<IActionResult> Index()
         {
+            var tests = await _statusCakeClient.GetTestsAsync();
             var viewModel = new IndexViewModel();
-
-            var tests = _context.Tests.Select(x => x);
 
             foreach (var test in tests)
             {
-                var uptimes = await _context.Availabilities.Where(x => x.TestID == test.Id && x.Date.Date >= DateTime.Now.Date.AddDays(-90)).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
+                var uptimes = await _context.Availabilities.Where(x => x.TestID == test.TestID && x.Date.Date >= DateTime.Now.Date.AddDays(-90)).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
 
                 // append today's uptime to the uptimes
                 uptimes[DateTime.Now.Date] = test.Uptime ?? 0;

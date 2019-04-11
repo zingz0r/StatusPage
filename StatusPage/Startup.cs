@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StatusCake.Client;
+using StatusCake.Client.Interfaces;
 using StatusPage.HostedServices;
 using StatusPage.Data;
 
@@ -28,6 +30,11 @@ namespace StatusPage
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            // inject statuscake client
+            var statusCakeUsername = Configuration.GetSection("StatusCake").GetValue<string>("Username");
+            var statusCakeApiKey = Configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
+            services.AddSingleton<IStatusCakeClient, StatusCakeClient>(s => new StatusCakeClient(statusCakeUsername, statusCakeApiKey));
 
             services.AddDbContext<StatusPageContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ConnectionString")));

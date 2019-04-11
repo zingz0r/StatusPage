@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StatusCake.Client.Interfaces;
 
 namespace StatusPage.HostedServices
 {
@@ -17,24 +18,20 @@ namespace StatusPage.HostedServices
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
-        private readonly StatusCakeClient _statusCakeClient;
+        private readonly IStatusCakeClient _statusCakeClient;
         private readonly StatusPageContext _context;
 
         private Timer _timer;
 
-        public DatabaseHostedService(ILogger<DatabaseHostedService> logger, IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        public DatabaseHostedService(ILogger<DatabaseHostedService> logger, IStatusCakeClient statusCakeClient, IConfiguration configuration, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _configuration = configuration;
+            _statusCakeClient = statusCakeClient;
 
             var scope = scopeFactory.CreateScope();
 
             _context = scope.ServiceProvider.GetRequiredService<StatusPageContext>();
-
-            var statusCakeUsername = _configuration.GetSection("StatusCake").GetValue<string>("Username");
-            var statusCakeApiKey = _configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
-
-            _statusCakeClient = new StatusCakeClient(statusCakeUsername, statusCakeApiKey);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
