@@ -10,7 +10,15 @@
     @foreach (var item in Model)
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            <small><i class="fas fa-circle text-success"></i></small>
+
+            @if (@item.IsDown)
+            {
+                <small><i class="fas fa-circle text-warning"></i></small>
+            }
+            else
+            {
+                <small><i class="fas fa-circle text-success"></i></small>
+            }
             <div style="width:20%; min-width: 160px;">
                 @if (item.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
@@ -28,83 +36,83 @@
             </div>
             <div id="chart-@(item.TestID)" class="w-100 pl-2 pr-3"></div>
 
-                @if (@item.IsDown)
-                {
-                    <span class="badge badge-warning badge-pill"> @item.Uptime%</span>
-                }
-                else
-                {
-                    <span class="badge badge-success badge-pill"> @item.Uptime%</span>
-                }
+            @if (@item.IsDown)
+            {
+                <span class="badge badge-warning badge-pill"> @item.Uptime%</span>
+            }
+            else
+            {
+                <span class="badge badge-success badge-pill"> @item.Uptime%</span>
+            }
 
         </li>
         dynamicJs = dynamicJs + $@"
-            var options_{item.TestID} = {{
-                chart: {{
-                    type: 'area',
-                    height: 30,
-                    sparkline: {{
-                        enabled: true,
-                    }}
-                }},
-
-                series: [{{
-                    name: 'Uptime',
-                    data: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Value)))},
-                }}],
-
-                xaxis: {{
-                    type: 'datetime',
-                    categories: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x=>x.Key)))},
-                }},
-
-                stroke: {{
-                    show: true,
-                    curve: 'smooth',
-                    lineCap: 'butt',
-                    width: 1,
-                    dashArray: 0,
-                }},
-                
-                colors: ['#b2bbc1'],
-
-                fill: {{
-                    type: 'gradient',
-                    gradient: {{
-                        shadeIntensity: 1,
-                        inverseColors: false,
-                        opacityFrom: 0.5,
-                        opacityTo: 0,
-                        stops: [0, 90, 100]
-                    }}
-                }},
-
-                yaxis: {{
-                    min: 0,
-                    max: 109,
-                    forceNiceScale: true,
-                }},
-
-                responsive: [{{
-                    breakpoint: undefined,
-                    options: {{}},
-                }}],
-
-                tooltip: {{
-                    fixed: {{
-                        enabled: false
-                    }},
-                }},
-
+    var options_{item.TestID} = {{
+        chart: {{
+            type: 'area',
+            height: 30,
+            sparkline: {{
+                enabled: true,
             }}
+        }},
 
-            var chart_{item.TestID} = new ApexCharts(
-                document.querySelector('#chart-{item.TestID}'),
-                options_{item.TestID}
-            );
+        series: [{{
+            name: 'Uptime',
+            data: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Value)))},
+        }}],
 
-            chart_{item.TestID}.render();
-        ";
+        xaxis: {{
+            type: 'datetime',
+            categories: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Key)))},
+        }},
+
+        stroke: {{
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            width: 1,
+            dashArray: 0,
+        }},
+
+        colors: ['#b2bbc1'],
+
+        fill: {{
+            type: 'gradient',
+            gradient: {{
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0,
+                stops: [0, 90, 100]
+            }}
+        }},
+
+        yaxis: {{
+            min: 0,
+            max: 109,
+            forceNiceScale: true,
+        }},
+
+        responsive: [{{
+            breakpoint: undefined,
+            options: {{}},
+        }}],
+
+        tooltip: {{
+            fixed: {{
+                enabled: false
+            }},
+        }},
+
+    }}
+
+    var chart_{item.TestID} = new ApexCharts(
+        document.querySelector('#chart-{item.TestID}'),
+        options_{item.TestID}
+    );
+
+    chart_{item.TestID}.render();
+";
     }
 </ul>
 
