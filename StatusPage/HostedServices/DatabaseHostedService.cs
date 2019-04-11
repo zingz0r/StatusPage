@@ -61,8 +61,6 @@ namespace StatusPage.HostedServices
                 InsertTest(test);
 
                 //// Insert Uptimes
-                var daysToShow = _configuration.GetSection("StatusCake").GetValue<int>("DaysToShowOnMetrics");
-
                 var uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
 
                 InsertUptime(test, uptimes);
@@ -133,7 +131,7 @@ namespace StatusPage.HostedServices
                     UptimePercent = availability.Uptime
                 };
 
-                if (!_context.Availabilities.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date != DateTime.Now.Date)
+                if (!_context.Availabilities.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date < DateTime.Now.Date)
                 {
                     _context.Add(availabilityEntity);
                     _context.SaveChanges();
