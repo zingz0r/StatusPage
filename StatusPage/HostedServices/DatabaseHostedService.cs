@@ -23,11 +23,11 @@ namespace StatusPage.HostedServices
 
         private Timer _timer;
 
-        public DatabaseHostedService(ILogger<DatabaseHostedService> logger, IStatusCakeClient statusCakeClient, IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        public DatabaseHostedService(ILogger<DatabaseHostedService> logger, IStatusCakeClient statusCakeClient, IServiceScopeFactory scopeFactory, IConfiguration configuration)
         {
             _logger = logger;
-            _configuration = configuration;
             _statusCakeClient = statusCakeClient;
+            _configuration = configuration;
 
             var scope = scopeFactory.CreateScope();
 

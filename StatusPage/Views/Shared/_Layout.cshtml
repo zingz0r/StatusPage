@@ -21,7 +21,12 @@
         </div>
         <br />
         <footer>
-            <p>&copy; @DateTime.Now.Year - TothNET Status Page</p>
+            <div class="col">
+                &copy; @DateTime.Now.Year - TothNET Status Page
+            </div>
+            <div class="col text-right">
+                v @System.Reflection.Assembly.GetEntryAssembly().GetName().Version
+            </div>
         </footer>
     </div>
 

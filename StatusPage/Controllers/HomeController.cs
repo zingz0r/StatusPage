@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using StatusCake.Client;
 using StatusCake.Client.Interfaces;
 using StatusPage.Data;
+using StatusPage.Interfaces;
 using StatusPage.Models;
 using StatusPage.ViewModels;
 
@@ -15,15 +16,17 @@ namespace StatusPage.Controllers
     public class HomeController : Controller
     {
         private readonly IStatusCakeClient _statusCakeClient;
+        private readonly ITestsModel _testsModel;
         private readonly StatusPageContext _context;
-        public HomeController(IStatusCakeClient statusCakeClient, StatusPageContext context)
+        public HomeController(IStatusCakeClient statusCakeClient, ITestsModel testsModel, StatusPageContext context)
         {
             _statusCakeClient = statusCakeClient;
+            _testsModel = testsModel;
             _context = context;
         }
         public async Task<IActionResult> Index()
         {
-            var tests = await _statusCakeClient.GetTestsAsync();
+            var tests = _testsModel.GetTests().Values;
             var viewModel = new IndexViewModel();
 
             foreach (var test in tests)

@@ -9,6 +9,8 @@ using StatusCake.Client;
 using StatusCake.Client.Interfaces;
 using StatusPage.HostedServices;
 using StatusPage.Data;
+using StatusPage.Interfaces;
+using StatusPage.Models;
 
 namespace StatusPage
 {
@@ -36,6 +38,11 @@ namespace StatusPage
             var statusCakeApiKey = Configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
             services.AddSingleton<IStatusCakeClient, StatusCakeClient>(s => new StatusCakeClient(statusCakeUsername, statusCakeApiKey));
 
+            // for live tests data
+            services.AddHostedService<TestsUpdaterHostedService>();
+            services.AddSingleton<ITestsModel, TestsModel>();
+
+            // db context
             services.AddDbContext<StatusPageContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ConnectionString")));
 
