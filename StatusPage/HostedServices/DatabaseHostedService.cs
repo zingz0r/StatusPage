@@ -111,14 +111,13 @@ namespace StatusPage.HostedServices
             {
                 var availabilityEntity = new Data.Entity.Availability
                 {
-                    Id = _context.Availabilities.Count() + 1,
-                    TestID = test.TestID,
                     Date = date,
+                    TestID = test.TestID,
                     DowntimePercent = availability.Downtime,
                     UptimePercent = availability.Uptime
                 };
 
-                if (_context.Availabilities.ContainsAsync(availabilityEntity).Result)
+                if (_context.Availabilities.Any(x=> x.Date == availabilityEntity.Date && x.TestID == availabilityEntity.TestID))
                     continue;
 
                 _context.Add(availabilityEntity);

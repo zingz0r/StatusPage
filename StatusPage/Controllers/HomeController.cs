@@ -31,12 +31,14 @@ namespace StatusPage.Controllers
 
             foreach (var test in tests)
             {
-                var uptimes = await _context.Availabilities.Where(x => x.TestID == test.TestID && x.Date.Date >= DateTime.Now.Date.AddDays(-90)).ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
+                var availabilities = await _context.Availabilities
+                    .Where(x => x.TestID == test.TestID && x.Date.Date >= DateTime.Now.Date.AddDays(-90))
+                    .ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
 
                 // append today's uptime to the uptimes
-                uptimes[DateTime.Now.Date] = test.Uptime ?? 0;
+                availabilities[DateTime.Now.Date] = test.Uptime ?? 0;
 
-                var advancedTest = new AdvancedTest(test, uptimes);
+                var advancedTest = new AdvancedTest(test, availabilities);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
