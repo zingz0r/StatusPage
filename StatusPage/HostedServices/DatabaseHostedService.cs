@@ -10,22 +10,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using StatusCake.Client.Interfaces;
 
 namespace StatusPage.HostedServices
 {
     public class DatabaseHostedService : IHostedService, IDisposable
     {
-        private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
         private readonly IStatusCakeClient _statusCakeClient;
         private readonly StatusPageContext _context;
 
         private Timer _timer;
 
-        public DatabaseHostedService(ILogger<DatabaseHostedService> logger, IStatusCakeClient statusCakeClient, IServiceScopeFactory scopeFactory, IConfiguration configuration)
+        public DatabaseHostedService(IStatusCakeClient statusCakeClient, IServiceScopeFactory scopeFactory, IConfiguration configuration)
         {
-            _logger = logger;
             _statusCakeClient = statusCakeClient;
             _configuration = configuration;
 
@@ -36,8 +35,6 @@ namespace StatusPage.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is starting.");
-
             _timer = new Timer(InsertNewDataToDb, null, TimeSpan.Zero,
                 TimeSpan.FromDays(1));
 
@@ -46,31 +43,21 @@ namespace StatusPage.HostedServices
 
         private void InsertNewDataToDb(object state)
         {
-            _logger.LogInformation("Fetching tests from StatusCake API.");
-
             IEnumerable<Test> allTests = _statusCakeClient.GetTestsAsync().Result;
 
             foreach (var test in allTests)
             {
-                _logger.LogInformation("Fetching uptimes data from StatusCake API.");
-
                 // Insert test
                 InsertTest(test);
 
                 //// Insert Uptimes
-                var uptimes = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
-
-                InsertUptime(test, uptimes);
-
-                _logger.LogInformation("Checking if there are new data.");
-
+                var availabilityData = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
+                InsertUptime(test, availabilityData);
             }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is stopping.");
-
             _timer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
@@ -89,7 +76,7 @@ namespace StatusPage.HostedServices
             if (test == null)
                 return;
 
-            Data.Entity.Test efTest = new Data.Entity.Test
+            var efTest = new Data.Entity.Test
             {
                 Id = test.TestID,
                 ContactID = test.ContactID,
@@ -117,6 +104,9 @@ namespace StatusPage.HostedServices
             if (availabilityData == null)
                 return;
 
+            // remove today's data because it can change until midnight
+            availabilityData.Remove(DateTime.Now.Date);
+
             foreach (var (date, availability) in availabilityData)
             {
                 var availabilityEntity = new Data.Entity.Availability
@@ -128,11 +118,11 @@ namespace StatusPage.HostedServices
                     UptimePercent = availability.Uptime
                 };
 
-                if (!_context.Availabilities.Any(x => x.TestID == availabilityEntity.TestID && x.Date == availabilityEntity.Date) && availabilityEntity.Date.Date < DateTime.Now.Date)
-                {
-                    _context.Add(availabilityEntity);
-                    _context.SaveChanges();
-                }
+                if (_context.Availabilities.ContainsAsync(availabilityEntity).Result)
+                    continue;
+
+                _context.Add(availabilityEntity);
+                _context.SaveChanges();
             }
         }
     }
