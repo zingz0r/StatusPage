@@ -58,12 +58,12 @@
 
         series: [{{
             name: 'Uptime',
-            data: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Value)))},
+            data: {Html.Raw(JsonConvert.SerializeObject(item.Availabilities.OrderBy(x => x.Key).Select(y => y.Value.Uptime)))},
         }}],
 
         xaxis: {{
             type: 'datetime',
-            categories: {Html.Raw(JsonConvert.SerializeObject(item.UptimeDictionary.OrderBy(y => y.Key).Select(x => x.Key)))},
+            categories: {Html.Raw(JsonConvert.SerializeObject(item.Availabilities.OrderBy(x => x.Key).Select(y => y.Key)))},
         }},
 
         stroke: {{

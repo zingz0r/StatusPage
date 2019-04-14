@@ -7,3 +7,22 @@ services:
     build:
       context: .
       dockerfile: StatusPage/Dockerfile
+    ports:
+      - "5784:80"
+    depends_on:
+      - statuspageapi
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+  statuspageapi:
+    image: ${DOCKER_REGISTRY-}statuspageapi
+    container_name: ${DOCKER_REGISTRY-}statuspageapi
+    build:
+      context: .
+      dockerfile: StatusPage.Api/Dockerfile
+    environment:
+      - StatusCake__Username=zingz0r
+      - StatusCake__ApiKey=Q9kCENWL7xAjsfbaTySYF04JMd_3Uw
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StatusCake.Client;
-using StatusCake.Client.Interfaces;
-using StatusPage.Data;
+using StatusCake.Client.Models;
 using StatusPage.Interfaces;
 using StatusPage.Models;
 using StatusPage.ViewModels;
@@ -15,30 +13,24 @@ namespace StatusPage.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IStatusCakeClient _statusCakeClient;
-        private readonly ITestsModel _testsModel;
-        private readonly StatusPageContext _context;
-        public HomeController(IStatusCakeClient statusCakeClient, ITestsModel testsModel, StatusPageContext context)
+        private readonly IStatusCakePersistence _statusCakePersistence;
+
+        public HomeController(IStatusCakePersistence statusCakePersistence)
         {
-            _statusCakeClient = statusCakeClient;
-            _testsModel = testsModel;
-            _context = context;
+            _statusCakePersistence = statusCakePersistence;
         }
         public async Task<IActionResult> Index()
         {
-            var tests = _testsModel.GetTests().Values;
+            var tests = await _statusCakePersistence.ReadTestsAsync();
+            var testsArray = tests as Test[] ?? tests.ToArray();
+
+            var availabilities = await _statusCakePersistence.ReadAvailabilitiesAsync();
+            
             var viewModel = new IndexViewModel();
 
-            foreach (var test in tests)
+            foreach (var test in testsArray)
             {
-                var availabilities = await _context.Availabilities
-                    .Where(x => x.TestID == test.TestID && x.Date.Date >= DateTime.Now.Date.AddDays(-90))
-                    .ToDictionaryAsync(t => t.Date, t => t.UptimePercent);
-
-                // append today's uptime to the uptimes
-                availabilities[DateTime.Now.Date] = test.Uptime ?? 0;
-
-                var advancedTest = new AdvancedTest(test, availabilities);
+                var advancedTest = new AdvancedTest(test, availabilities.FirstOrDefault(x => x.Key == test.TestID).Value);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
@@ -49,21 +41,22 @@ namespace StatusPage.Controllers
                     viewModel.ServiceTests.Add(advancedTest);
                 }
 
-            }
+            } 
+            
+            // average uptime in last 7 days
+            var lastMonthData = availabilities.SelectMany(x => x.Value)
+                .Where(x => x.Key >= DateTime.Now.Date.AddMonths(-1))
+                .GroupBy(y => y.Key);
 
-            //// average uptime in last 7 days
-            var lastMonthData = await _context.Availabilities
-                .Where(x => x.Date.Date >= DateTime.Now.Date.AddMonths(-1))
-                .GroupBy(y => y.Date).ToDictionaryAsync(x => x.Key, x => x.ToList());
-
-            foreach (var (key, value) in lastMonthData)
+            foreach (var data in lastMonthData)
             {
-                viewModel.LastMonthAverageUptime.Add(key, value.Average(x => x.UptimePercent));
+                var averageUptime = data.Select(x => x.Value).ToList().Average(y=>y.Uptime);
+                viewModel.LastMonthAverageUptime.Add(data.Key, averageUptime);
             }
 
             // append today's uptime to the average uptimes
 
-            var todayAverage = tests.Average(x => x.Uptime);
+            var todayAverage = testsArray.Average(x => x.Uptime);
             viewModel.LastMonthAverageUptime[DateTime.Now.Date] = todayAverage ?? 0;
 
             return View(viewModel);

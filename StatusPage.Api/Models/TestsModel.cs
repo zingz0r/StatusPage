@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using StatusCake.Client.Models;
-using StatusPage.Interfaces;
+using StatusPage.Api.Interfaces;
 
-namespace StatusPage.Models
+namespace StatusPage.Api.Models
 {
     public class TestsModel : ITestsModel
     {
-        public SortedList<double, Test> Tests { get; }
+        public SortedList<int, Test> Tests { get; }
 
         public TestsModel()
         {
-            Tests = new SortedList<double, Test>();
+            Tests = new SortedList<int, Test>();
         }
 
-        public SortedList<double, Test> GetTests()
+        public SortedList<int, Test> GetTests()
         {
             return Tests;
         }

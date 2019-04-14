@@ -4,23 +4,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using StatusCake.Client.Interfaces;
-using StatusPage.Interfaces;
+using StatusPage.Api.Interfaces;
 
-namespace StatusPage.HostedServices
+namespace StatusPage.Api.HostedServices
 {
 
-    internal class TestsUpdaterHostedService : IHostedService, IDisposable
+    internal class CakeUpdaterHostedService : IHostedService, IDisposable
     {
         private readonly IStatusCakeClient _statusCakeClient;
         private readonly ITestsModel _testsModel;
+        private readonly IAvailabilityModel _availabilityModel;
         private Timer _timer;
 
-        public TestsUpdaterHostedService(IStatusCakeClient statusCakeClient, ITestsModel testsModel)
+        public CakeUpdaterHostedService(IStatusCakeClient statusCakeClient, ITestsModel testsModel, IAvailabilityModel availabilityModel)
         {
             _statusCakeClient = statusCakeClient;
             _testsModel = testsModel;
+            _availabilityModel = availabilityModel;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -37,6 +38,9 @@ namespace StatusPage.HostedServices
             foreach (var test in tests)
             {
                 _testsModel.UpdateTest(test);
+                var availabilities = _statusCakeClient.GetUptimesAsync(test.TestID).Result;
+
+                _availabilityModel.UpdateAvailability(test.TestID, availabilities);
             }
         }
 

@@ -11,9 +11,9 @@ namespace StatusPage.Models
         public bool IsDown { get; set; }
         public string StatusText { get; set; }
 
-        public Dictionary<DateTime, double> UptimeDictionary { get; set; }
+        public SortedDictionary<DateTime, Availability> Availabilities { get; set; }
 
-        public AdvancedTest(Test other, Dictionary<DateTime, double> uptimeDictionary)
+        public AdvancedTest(Test other, SortedDictionary<DateTime, Availability> availabilities)
         {
             ContactGroup = null;
             ContactID = other.ContactID;
@@ -25,7 +25,7 @@ namespace StatusPage.Models
             TestType = other.TestType;
             WebsiteName = other.WebsiteName;
             Uptime = other.Uptime;
-            UptimeDictionary = uptimeDictionary;
+            Availabilities = availabilities;
         }
     }
 }

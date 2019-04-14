@@ -2,15 +2,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StatusCake.Client;
-using StatusCake.Client.Interfaces;
-using StatusPage.HostedServices;
-using StatusPage.Data;
+using StatusPage.Configs;
 using StatusPage.Interfaces;
-using StatusPage.Models;
+using StatusPage.Persistence;
 
 namespace StatusPage
 {
@@ -26,28 +22,17 @@ namespace StatusPage
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // api
+            var apiUrl = Configuration.GetSection("ApiSettings").Get<ApiConfig>();
+            services.AddSingleton<IStatusCakePersistence, StatusCakePersistence>(s => new StatusCakePersistence(apiUrl.StatusPageApiUrl));
+
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            // inject statuscake client
-            var statusCakeUsername = Configuration.GetSection("StatusCake").GetValue<string>("Username");
-            var statusCakeApiKey = Configuration.GetSection("StatusCake").GetValue<string>("ApiKey");
-            services.AddSingleton<IStatusCakeClient, StatusCakeClient>(s => new StatusCakeClient(statusCakeUsername, statusCakeApiKey));
-
-            // for live tests data
-            services.AddHostedService<TestsUpdaterHostedService>();
-            services.AddSingleton<ITestsModel, TestsModel>();
-
-            // db context
-            services.AddDbContext<StatusPageContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("ConnectionString")));
-
-            // Background worker db pusher
-            services.AddHostedService<DatabaseHostedService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
