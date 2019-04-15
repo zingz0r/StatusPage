@@ -35,17 +35,19 @@
                 }
             </div>
             <div id="chart-@(item.TestID)" class="w-100 pl-2 pr-3"></div>
+            
+            <div style="min-width: 60px;" class="text-center">
+                @if (@item.IsDown)
+                {
+                    <span class="badge badge-warning badge-pill"> @(item.Uptime??99)%</span>
+                }
+                else
+                {
+                    <span class="badge badge-success badge-pill"> @(item.Uptime??100)%</span>
+                }
+            </div>
 
-            @if (@item.IsDown)
-            {
-                <span class="badge badge-warning badge-pill"> @item.Uptime%</span>
-            }
-            else
-            {
-                <span class="badge badge-success badge-pill"> @item.Uptime%</span>
-            }
-
-        </li>
+</li>
         dynamicJs = dynamicJs + $@"
     var options_{item.TestID} = {{
         chart: {{

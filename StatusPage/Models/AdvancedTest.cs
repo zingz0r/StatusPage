@@ -2,6 +2,7 @@
 using StatusCake.Client.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using StatusCake.Client;
 
 namespace StatusPage.Models

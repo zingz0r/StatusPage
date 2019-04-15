@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using StatusCake.Client.Models;
@@ -25,12 +26,19 @@ namespace StatusPage.Controllers
             var testsArray = tests as Test[] ?? tests.ToArray();
 
             var availabilities = await _statusCakePersistence.ReadAvailabilitiesAsync();
-            
+
             var viewModel = new IndexViewModel();
 
             foreach (var test in testsArray)
             {
-                var advancedTest = new AdvancedTest(test, availabilities.FirstOrDefault(x => x.Key == test.TestID).Value);
+                availabilities[test.TestID][DateTime.Now.Date].Uptime = test.Uptime ?? 100;
+
+                var last90days = new SortedDictionary<DateTime, Availability>(availabilities
+                    .FirstOrDefault(x => x.Key == test.TestID)
+                    .Value.Where(x => x.Key >= DateTime.Now.Date.AddDays(-90))
+                    .ToDictionary(x => x.Key, x => x.Value));
+
+                var advancedTest = new AdvancedTest(test, last90days);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
@@ -41,8 +49,8 @@ namespace StatusPage.Controllers
                     viewModel.ServiceTests.Add(advancedTest);
                 }
 
-            } 
-            
+            }
+
             // average uptime in last 7 days
             var lastMonthData = availabilities.SelectMany(x => x.Value)
                 .Where(x => x.Key >= DateTime.Now.Date.AddMonths(-1))
@@ -50,7 +58,7 @@ namespace StatusPage.Controllers
 
             foreach (var data in lastMonthData)
             {
-                var averageUptime = data.Select(x => x.Value).ToList().Average(y=>y.Uptime);
+                var averageUptime = data.Select(x => x.Value).ToList().Average(y => y.Uptime);
                 viewModel.LastMonthAverageUptime.Add(data.Key, averageUptime);
             }
 
