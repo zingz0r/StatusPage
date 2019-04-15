@@ -30,6 +30,10 @@ namespace StatusPage.Controllers
 
             foreach (var test in testsArray)
             {
+                if (!availabilities.ContainsKey(test.TestID))
+                {
+                    availabilities[test.TestID] = new SortedDictionary<DateTime, Availability>();
+                }
                 availabilities[test.TestID][DateTime.Now.Date] = new Availability()
                 {
                     Uptime = test.Uptime ?? 100,
