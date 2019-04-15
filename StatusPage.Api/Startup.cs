@@ -73,8 +73,7 @@ namespace StatusPage.Api
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "StatusPage API v1");
                 });
-
-            app.UseHttpsRedirection();
+            
             app.UseMvc();
         }
     }

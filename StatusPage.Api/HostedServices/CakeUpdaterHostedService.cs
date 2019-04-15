@@ -35,6 +35,7 @@ namespace StatusPage.Api.HostedServices
         private void UpdateTestsModel(object state)
         {
             var tests = _statusCakeClient.GetTestsAsync().Result;
+            
             foreach (var test in tests)
             {
                 _testsModel.UpdateTest(test);

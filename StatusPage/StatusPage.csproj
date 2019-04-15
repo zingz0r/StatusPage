@@ -5,8 +5,8 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>d0e00278-b0e9-412f-b191-c3553374225a</UserSecretsId>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
-    <AssemblyVersion>1.3.2.0</AssemblyVersion>
-    <FileVersion>1.3.2.0</FileVersion>
+    <AssemblyVersion>1.3.2.1</AssemblyVersion>
+    <FileVersion>1.3.2.1</FileVersion>
     <Version>1.3.2</Version>
   </PropertyGroup>
 

@@ -6,21 +6,21 @@ namespace StatusPage.Api.Models
 {
     public class TestsModel : ITestsModel
     {
-        public SortedList<int, Test> Tests { get; }
+        private readonly SortedList<int, Test> _tests;
 
         public TestsModel()
         {
-            Tests = new SortedList<int, Test>();
+            _tests = new SortedList<int, Test>();
         }
 
         public SortedList<int, Test> GetTests()
         {
-            return Tests;
+            return _tests;
         }
 
         public void UpdateTest(Test test)
         {
-            Tests[test.TestID] = test;
+            _tests[test.TestID] = test;
         }
     }
 }
