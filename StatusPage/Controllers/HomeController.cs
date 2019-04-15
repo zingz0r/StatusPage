@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using StatusCake.Client.Models;
@@ -31,14 +30,18 @@ namespace StatusPage.Controllers
 
             foreach (var test in testsArray)
             {
-                availabilities[test.TestID][DateTime.Now.Date].Uptime = test.Uptime ?? 100;
+                availabilities[test.TestID][DateTime.Now.Date] = new Availability()
+                {
+                    Uptime = test.Uptime ?? 100,
+                    Downtime = 100 - test.Uptime ?? 0
+                };
 
-                var last90days = new SortedDictionary<DateTime, Availability>(availabilities
+                var last90Days = new SortedDictionary<DateTime, Availability>(availabilities
                     .FirstOrDefault(x => x.Key == test.TestID)
                     .Value.Where(x => x.Key >= DateTime.Now.Date.AddDays(-90))
                     .ToDictionary(x => x.Key, x => x.Value));
 
-                var advancedTest = new AdvancedTest(test, last90days);
+                var advancedTest = new AdvancedTest(test, last90Days);
 
                 if (test.TestType == StatusCake.Client.Enumerators.TestType.Http)
                 {
