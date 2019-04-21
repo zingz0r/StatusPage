@@ -13,5 +13,16 @@ namespace StatusPage.Api.Interfaces
         /// <returns>Return the availabilities data</returns>
         Dictionary<int, SortedDictionary<DateTime, Availability>> GetAvailabilities();
         void UpdateAvailability(int testId, SortedDictionary<DateTime, Availability> availabilities);
+
+
+        /// <summary>
+        /// Lock the container
+        /// </summary>
+        void Lock();
+        
+        /// <summary>
+        /// Unlock the container and overwrite the data with the updated values 
+        /// </summary>
+        void Unlock();
     }
 }

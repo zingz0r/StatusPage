@@ -35,7 +35,9 @@ namespace StatusPage.Api.HostedServices
         private void UpdateTestsModel(object state)
         {
             var tests = _statusCakeClient.GetTestsAsync().Result;
-            
+
+            _availabilityModel.Lock();
+
             foreach (var test in tests)
             {
                 _testsModel.UpdateTest(test);
@@ -43,6 +45,8 @@ namespace StatusPage.Api.HostedServices
 
                 _availabilityModel.UpdateAvailability(test.TestID, availabilities);
             }
+
+            _availabilityModel.Unlock();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
