@@ -34,11 +34,11 @@ namespace StatusPage.Controllers
                 {
                     availabilities[test.TestID] = new SortedDictionary<DateTime, Availability>();
                 }
-                availabilities[test.TestID][DateTime.Now.Date] = new Availability()
-                {
-                    Uptime = test.Uptime ?? 100,
-                    Downtime = 100 - test.Uptime ?? 0
-                };
+
+                var lastElementIndex = availabilities[test.TestID].Count - 1;
+
+                // update last date 
+                availabilities[test.TestID].ElementAt(lastElementIndex).Value.Uptime = test.Uptime ?? 100;
 
                 var last90Days = new SortedDictionary<DateTime, Availability>(availabilities
                     .FirstOrDefault(x => x.Key == test.TestID)

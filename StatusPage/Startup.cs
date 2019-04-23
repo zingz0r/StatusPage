@@ -25,8 +25,7 @@ namespace StatusPage
             // api
             var apiUrl = Configuration.GetSection("ApiSettings").Get<ApiConfig>();
             services.AddSingleton<IStatusCakePersistence, StatusCakePersistence>(s => new StatusCakePersistence(apiUrl.StatusPageApiUrl));
-
-
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
