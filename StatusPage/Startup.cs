@@ -23,8 +23,8 @@ namespace StatusPage
         public void ConfigureServices(IServiceCollection services)
         {
             // api
-            var apiUrl = Configuration.GetSection("ApiSettings").Get<ApiConfig>();
-            services.AddSingleton<IStatusCakePersistence, StatusCakePersistence>(s => new StatusCakePersistence(apiUrl.StatusPageApiUrl));
+            var apiConfig = Configuration.GetSection("ApiSettings").Get<ApiConfig>();
+            services.AddSingleton<IStatusCakePersistence, StatusCakePersistence>(s => new StatusCakePersistence(apiConfig.StatusPageApiUrl));
             
             services.Configure<CookiePolicyOptions>(options =>
             {

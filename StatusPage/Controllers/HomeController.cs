@@ -65,7 +65,7 @@ namespace StatusPage.Controllers
 
             foreach (var data in lastMonthData)
             {
-                var averageUptime = data.Select(x => x.Value).ToList().Average(y => y.Uptime);
+                var averageUptime = data.Select(x => x.Value).Average(y => y.Uptime);
                 viewModel.LastMonthAverageUptime.Add(data.Key, averageUptime);
             }
 
