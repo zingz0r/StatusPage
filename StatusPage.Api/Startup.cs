@@ -41,9 +41,8 @@ namespace StatusPage.Api
                 });
             });
 
-            // inject statuscake client
-            var statusCakeConfig = Configuration.GetSection("StatusCake").Get<StatusCakeConfig>();
-            services.AddSingleton<IStatusCakeClient, StatusCakeClient>(s => new StatusCakeClient(statusCakeConfig.UserName, statusCakeConfig.ApiKey));
+            // inject statuscake config
+            services.AddTransient(s => Configuration.GetSection("StatusCake").Get<StatusCakeConfig>());
 
             // tests data updater
             services.AddHostedService<CakeUpdaterHostedService>();
